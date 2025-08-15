@@ -22,14 +22,12 @@ This project is a simple and interactive **Tic-Tac-Toe** web application built u
 
 ---
 
-## About
-
-This Tic-Tac-Toe project was created to practice DOM manipulation, event handling, and game logic in JavaScript. It demonstrates fundamental front-end development skills while providing a fun and interactive game.  
-
-Live demo: [https://abhaydutta.github.io/PRODIGY_WD_03/](https://abhaydutta.github.io/PRODIGY_WD_03/)
-
----
-
 ## Screenshot
 
 ![Tic-Tac-Toe Screenshot](Images/TicTacToe.png)
+
+---
+
+## About
+
+This Tic-Tac-Toe project was created to practice DOM manipulation, event handling, and game logic in JavaScript. It demonstrates fundamental front-end development skills while providing a fun and interactive game.  

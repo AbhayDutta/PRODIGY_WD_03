@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #8EC5FC, #E0C3FC);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    select, button {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    button:hover, select:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    .gameboard {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 15px;
+    }
+
+    .gamecell {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #333;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .gamecell:hover {
+      background: #f2f2f2;
+    }
+
+    #message {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-top: 30px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tic Tac Toe</h1>
+
+  <div class="controls">
+    <select id="mode-select">
+      <option value="human">Human vs Human</option>
+      <option value="ai">Human vs AI</option>
+    </select>
+    <button id="reset-btn">Reset Game</button>
+  </div>
+
+  <div class="gameboard" id="board">
+    <div class="gamecell" data-index="0"></div>
+    <div class="gamecell" data-index="1"></div>
+    <div class="gamecell" data-index="2"></div>
+    <div class="gamecell" data-index="3"></div>
+    <div class="gamecell" data-index="4"></div>
+    <div class="gamecell" data-index="5"></div>
+    <div class="gamecell" data-index="6"></div>
+    <div class="gamecell" data-index="7"></div>
+    <div class="gamecell" data-index="8"></div>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const board = Array(9).fill(null);
+    const cells = document.querySelectorAll('.gamecell');
+    const message = document.getElementById('message');
+    const modeSelect = document.getElementById('mode-select');
+    let currentPlayer = 'X';
+    let gameOver = false;
+
+    const WINNING_COMBOS = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function checkWinner(b) {
+      for (let combo of WINNING_COMBOS) {
+        const [a, b1, c] = combo;
+        if (b[a] && b[a] === b[b1] && b[a] === b[c]) {
+          return b[a];
+        }
+      }
+      if (b.every(cell => cell)) return 'Tie';
+      return null;
+    }
+
+    function aiMove() {
+      if (gameOver) return;
+      const empty = board.map((val, i) => val ? null : i).filter(i => i !== null);
+      if (empty.length === 0) return;
+      const randomIndex = empty[Math.floor(Math.random() * empty.length)];
+      board[randomIndex] = 'O';
+      cells[randomIndex].textContent = 'O';
+
+      const result = checkWinner(board);
+      if (result) {
+        endGame(result);
+      } else {
+        currentPlayer = 'X';
+      }
+    }
+
+    function handleClick(e) {
+      const index = e.target.getAttribute('data-index');
+      if (board[index] || gameOver) return;
+
+      const mode = modeSelect.value;
+
+      if (mode === 'human') {
+        board[index] = currentPlayer;
+        e.target.textContent = currentPlayer;
+        const result = checkWinner(board);
+        if (result) {
+          endGame(result);
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+      } else if (mode === 'ai') {
+        board[index] = 'X';
+        e.target.textContent = 'X';
+        const result = checkWinner(board);
+        if (result) {
+          endGame(result);
+        } else {
+          currentPlayer = 'O';
+          setTimeout(aiMove, 500);
+        }
+      }
+    }
+
+    function endGame(winner) {
+      gameOver = true;
+      if (winner === 'Tie') {
+        message.textContent = "It's a Tie!";
+      } else {
+        message.textContent = `${winner === 'X' ? 'Player X' : (modeSelect.value === 'ai' ? 'AI' : 'Player O')} Wins!`;
+      }
+    }
+
+    function resetGame() {
+      for (let i = 0; i < 9; i++) {
+        board[i] = null;
+        cells[i].textContent = '';
+      }
+      gameOver = false;
+      currentPlayer = 'X';
+      message.textContent = '';
+    }
+
+    cells.forEach(cell => cell.addEventListener('click', handleClick));
+    document.getElementById('reset-btn').addEventListener('click', resetGame);
+  </script>
+
+</body>
+</html>
